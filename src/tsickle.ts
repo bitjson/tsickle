@@ -16,6 +16,7 @@ import {toArray} from './util';
 
 export {convertDecorators} from './decorator-annotator';
 export {processES5} from './es5processor';
+export {fixIndexImports} from './esm_explicit_index';
 
 export interface Options {
   /**
