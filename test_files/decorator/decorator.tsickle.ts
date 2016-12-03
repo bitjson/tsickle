@@ -21,31 +21,16 @@ function classDecorator(t: any) { return t; }
  * @return {?}
  */
 function classAnnotation(t: any) { return t; }
+@classAnnotation
 class DecoratorTest {
   @decorator
 private x: number;
+
+  @annotationDecorator
 private y: number;
-static decorators: DecoratorInvocation[] = [
-{ type: classAnnotation },
-];
-/** @nocollapse */
-static ctorParameters: () => ({type: any, decorators?: DecoratorInvocation[]}|null)[] = () => [
-];
-static propDecorators: {[key: string]: DecoratorInvocation[]} = {
-'y': [{ type: annotationDecorator },],
-};
 }
 
 function DecoratorTest_tsickle_Closure_declarations() {
-/** @type {!Array<!DecoratorInvocation>} */
-DecoratorTest.decorators;
-/**
- * @nocollapse
- * @type {function(): !Array<(null|{type: ?, decorators: (undefined|!Array<!DecoratorInvocation>)})>}
- */
-DecoratorTest.ctorParameters;
-/** @type {!Object<string,!Array<!DecoratorInvocation>>} */
-DecoratorTest.propDecorators;
 /** @type {number} */
 DecoratorTest.prototype.x;
 /** @type {number} */
@@ -62,15 +47,3 @@ function DecoratedClass_tsickle_Closure_declarations() {
 DecoratedClass.prototype.z;
 }
 
-/** @record */
-function DecoratorInvocation() {}
-/** @type {!Function} */
-DecoratorInvocation.prototype.type;
-/** @type {(undefined|!Array<?>)} */
-DecoratorInvocation.prototype.args;
-
-
-interface DecoratorInvocation {
-  type: Function;
-  args?: any[];
-}

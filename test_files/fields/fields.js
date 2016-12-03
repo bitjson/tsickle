@@ -29,6 +29,5 @@ function FieldsTest_tsickle_Closure_declarations() {
 let /** @type {!FieldsTest} */ fieldsTest = new FieldsTest(3);
 // Ensure the type is understood by Closure.
 fieldsTest.field1 = 'hi';
-let /** @type {?} */ AnonymousClass = class {
-}
-;
+let /** @type {!(Anonymous class)} */ AnonymousClass = class {
+};

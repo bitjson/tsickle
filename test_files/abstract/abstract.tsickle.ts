@@ -15,7 +15,7 @@ simple() {}
 publicAbstract() {}
 /**
  * @abstract
- * @param {!Array<number>} x
+ * @param {!Array} x
  * @return {void}
  */
 params(x: number[]) {}
@@ -53,7 +53,7 @@ simple() {}
  */
 publicAbstract() {}
 /**
- * @param {!Array<number>} x
+ * @param {!Array} x
  * @return {void}
  */
 params(x: number[]): void { }

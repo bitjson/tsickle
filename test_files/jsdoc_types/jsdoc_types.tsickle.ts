@@ -27,7 +27,7 @@ let /** @type {!ClassOne} */ useLocalClassRenamed = new RenamedClassOne();
 let /** @type {!RenamedClassTwo} */ useLocalClassRenamedTwo = new RenamedClassTwo();
 let /** @type {!ClassOne} */ useLocalClassAsTypeRenamed: RenamedClassOne;
 let /** @type {!Interface} */ useLocalInterface: Interface;
-let /** @type {!ClassWithParams<number>} */ useClassWithParams: ClassWithParams<number>;
+let /** @type {!ClassWithParams} */ useClassWithParams: ClassWithParams<number>;
 
 // This is purely a value; it doesn't need renaming.
 let /** @type {number} */ useLocalValue = value;

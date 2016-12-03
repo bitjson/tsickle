@@ -20,30 +20,21 @@ function classDecorator(t) { return t; }
  * @return {?}
  */
 function classAnnotation(t) { return t; }
-class DecoratorTest {
-}
-DecoratorTest.decorators = [
-    { type: classAnnotation },
-];
-/** @nocollapse */
-DecoratorTest.ctorParameters = () => [];
-DecoratorTest.propDecorators = {
-    'y': [{ type: annotationDecorator },],
+let DecoratorTest = class DecoratorTest {
 };
 __decorate([
-    decorator, 
-    __metadata('design:type', Number)
+    decorator,
+    __metadata("design:type", Number)
 ], DecoratorTest.prototype, "x", void 0);
+__decorate([
+    annotationDecorator,
+    __metadata("design:type", Number)
+], DecoratorTest.prototype, "y", void 0);
+DecoratorTest = __decorate([
+    classAnnotation,
+    __metadata("design:paramtypes", [])
+], DecoratorTest);
 function DecoratorTest_tsickle_Closure_declarations() {
-    /** @type {!Array<!DecoratorInvocation>} */
-    DecoratorTest.decorators;
-    /**
-     * @nocollapse
-     * @type {function(): !Array<(null|{type: ?, decorators: (undefined|!Array<!DecoratorInvocation>)})>}
-     */
-    DecoratorTest.ctorParameters;
-    /** @type {!Object<string,!Array<!DecoratorInvocation>>} */
-    DecoratorTest.propDecorators;
     /** @type {number} */
     DecoratorTest.prototype.x;
     /** @type {number} */
@@ -52,16 +43,10 @@ function DecoratorTest_tsickle_Closure_declarations() {
 let DecoratedClass = class DecoratedClass {
 };
 DecoratedClass = __decorate([
-    classDecorator, 
-    __metadata('design:paramtypes', [])
+    classDecorator,
+    __metadata("design:paramtypes", [])
 ], DecoratedClass);
 function DecoratedClass_tsickle_Closure_declarations() {
     /** @type {string} */
     DecoratedClass.prototype.z;
 }
-/** @record */
-function DecoratorInvocation() { }
-/** @type {!Function} */
-DecoratorInvocation.prototype.type;
-/** @type {(undefined|!Array<?>)} */
-DecoratorInvocation.prototype.args;

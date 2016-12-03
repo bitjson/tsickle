@@ -31,5 +31,5 @@ function NonPrimitives_tsickle_Closure_declarations() {
  * @return {void}
  */
 function takesNonNullable(val) { }
-let /** @type {{field: (null|string|number)}} */ x = { field: null };
+let /** @type {?} */ x = { field: null };
 takesNonNullable(/** @type {(string|number)} */ ((x.field)));

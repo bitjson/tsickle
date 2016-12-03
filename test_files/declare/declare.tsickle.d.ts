@@ -1,4 +1,4 @@
-Warning at test_files/declare/declare.d.ts:81:1: anonymous type has no symbol
+Warning at test_files/declare/declare.d.ts:81:1: unhandled type {type flags:0x8000 Object}
 ====
 declare namespace DeclareTestModule {
   namespace inner {

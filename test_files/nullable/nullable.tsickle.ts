@@ -1,3 +1,5 @@
+Warning at test_files/nullable/nullable.ts:21:5: unhandled type {type flags:0x8000 Object}
+====
 
 class Primitives {
   nullable: string|null;
@@ -45,5 +47,5 @@ NonPrimitives.prototype.optional;
  */
 function takesNonNullable(val: string|number) {}
 
-let /** @type {{field: (null|string|number)}} */ x: {field: string | null | number} = {field: null};
+let /** @type {?} */ x: {field: string | null | number} = {field: null};
 takesNonNullable( /** @type {(string|number)} */((x.field)));

@@ -37,6 +37,7 @@ export function typeToDebugString(type: ts.Type): string {
   let debugString = `flags:0x${type.flags.toString(16)}`;
 
   const basicTypes: ts.TypeFlags[] = [
+
     ts.TypeFlags.Any,
     ts.TypeFlags.String,
     ts.TypeFlags.Number,
@@ -52,16 +53,9 @@ export function typeToDebugString(type: ts.Type): string {
     ts.TypeFlags.Null,
     ts.TypeFlags.Never,
     ts.TypeFlags.TypeParameter,
-    ts.TypeFlags.Class,
-    ts.TypeFlags.Interface,
-    ts.TypeFlags.Reference,
-    ts.TypeFlags.Tuple,
+    ts.TypeFlags.Object,
     ts.TypeFlags.Union,
     ts.TypeFlags.Intersection,
-    ts.TypeFlags.Anonymous,
-    ts.TypeFlags.Instantiated,
-    ts.TypeFlags.ThisType,
-    ts.TypeFlags.ObjectLiteralPatternWithComputedProperties,
   ];
   for (let flag of basicTypes) {
     if ((type.flags & flag) !== 0) {
@@ -223,85 +217,86 @@ export class TypeTranslator {
     }
 
     if (type.symbol && this.isBlackListed(type.symbol)) return '?';
+    console.error(typeToDebugString(type));
 
     let notNullPrefix = notNull ? '!' : '';
 
-    if (type.flags & ts.TypeFlags.Class) {
-      if (!type.symbol) {
-        this.warn('class has no symbol');
-        return '?';
-      }
-      return notNullPrefix + this.symbolToString(type.symbol);
-    } else if (type.flags & ts.TypeFlags.Interface) {
-      // Note: ts.InterfaceType has a typeParameters field, but that
-      // specifies the parameters that the interface type *expects*
-      // when it's used, and should not be transformed to the output.
-      // E.g. a type like Array<number> is a TypeReference to the
-      // InterfaceType "Array", but the "number" type parameter is
-      // part of the outer TypeReference, not a typeParameter on
-      // the InterfaceType.
-      if (!type.symbol) {
-        this.warn('interface has no symbol');
-        return '?';
-      }
-      if (type.symbol.flags & ts.SymbolFlags.Value) {
-        // The symbol is both a type and a value.
-        // For user-defined types in this state, we don't have a Closure name
-        // for the type.  See the type_and_value test.
-        if (!isClosureProvidedType(type.symbol)) {
-          this.warn(`type/symbol conflict for ${type.symbol.name}, using {?} for now`);
+    if (type.symbol) {
+      console.error(symbolToDebugString(type.symbol));
+      if (type.symbol.flags & ts.SymbolFlags.Class) {
+        return notNullPrefix + this.symbolToString(type.symbol);
+      } else if (type.flags & ts.TypeFlags.Object) {
+        const objectFlags = (type as ts.ObjectType).objectFlags;
+        if (objectFlags & ts.ObjectFlags.Reference) {
+         // A reference to another type, e.g. Array<number> refers to Array.
+         // Emit the referenced type and any type arguments.
+         let referenceType = type as ts.TypeReference;
+
+         let typeStr = '';
+         let isTuple = (objectFlags & ts.ObjectFlags.Tuple) !== 0;
+         // For unknown reasons, tuple types can be reference types containing a
+         // reference loop. see Destructuring3 in functions.ts.
+         // TODO(rado): handle tuples in their own branch.
+         console.error('reft', referenceType);
+         if (!isTuple) {
+           if (referenceType.target === referenceType) {
+             // We get into an infinite loop here if the inner reference is
+             // the same as the outer; this can occur when this function
+             // fails to translate a more specific type before getting to
+             // this point.
+             throw new Error(
+                 `reference loop in ${typeToDebugString(referenceType)} ${referenceType.flags}`);
+           }
+           typeStr += this.translate(referenceType.target, notNull);
+         }
+         if (referenceType.typeArguments) {
+           let params = referenceType.typeArguments.map(t => this.translate(t, true));
+           typeStr += isTuple ? notNullPrefix + `Array` : `<${params.join(', ')}>`;
+         }
+         return typeStr;
+      } //else
+      /*} else if (type.flags & ts.TypeFlags.Anonymous) {
+        if (!type.symbol) {
+          // This comes up when generating code for an arrow function as passed
+          // to a generic function.  The passed-in type is tagged as anonymous
+          // and has no properties so it's hard to figure out what to generate.
+          // Just avoid it for now so we don't crash.
+          this.warn('anonymous type has no symbol');
           return '?';
         }
-      }
-      return notNullPrefix + this.symbolToString(type.symbol);
-    } else if (type.flags & ts.TypeFlags.Reference) {
-      // A reference to another type, e.g. Array<number> refers to Array.
-      // Emit the referenced type and any type arguments.
-      let referenceType = type as ts.TypeReference;
 
-      let typeStr = '';
-      let isTuple = (referenceType.flags & ts.TypeFlags.Tuple) > 0;
-      // For unknown reasons, tuple types can be reference types containing a
-      // reference loop. see Destructuring3 in functions.ts.
-      // TODO(rado): handle tuples in their own branch.
-      if (!isTuple) {
-        if (referenceType.target === referenceType) {
-          // We get into an infinite loop here if the inner reference is
-          // the same as the outer; this can occur when this function
-          // fails to translate a more specific type before getting to
-          // this point.
-          throw new Error(
-              `reference loop in ${typeToDebugString(referenceType)} ${referenceType.flags}`);
+        if (type.symbol.flags === ts.SymbolFlags.TypeLiteral) {
+          return this.translateTypeLiteral(type, notNull);
+        } else if (
+            type.symbol.flags === ts.SymbolFlags.Function ||
+            type.symbol.flags === ts.SymbolFlags.Method) {
+          let sigs = this.typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call);
+          if (sigs.length === 1) {
+            return this.signatureToClosure(sigs[0]);
+          }
         }
-        typeStr += this.translate(referenceType.target, notNull);
-      }
-      if (referenceType.typeArguments) {
-        let params = referenceType.typeArguments.map(t => this.translate(t, true));
-        typeStr += isTuple ? notNullPrefix + `Array` : `<${params.join(', ')}>`;
-      }
-      return typeStr;
-    } else if (type.flags & ts.TypeFlags.Anonymous) {
-      if (!type.symbol) {
-        // This comes up when generating code for an arrow function as passed
-        // to a generic function.  The passed-in type is tagged as anonymous
-        // and has no properties so it's hard to figure out what to generate.
-        // Just avoid it for now so we don't crash.
-        this.warn('anonymous type has no symbol');
+        this.warn('unhandled anonymous type');
         return '?';
-      }
-
-      if (type.symbol.flags === ts.SymbolFlags.TypeLiteral) {
-        return this.translateTypeLiteral(type, notNull);
-      } else if (
-          type.symbol.flags === ts.SymbolFlags.Function ||
-          type.symbol.flags === ts.SymbolFlags.Method) {
-        let sigs = this.typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call);
-        if (sigs.length === 1) {
-          return this.signatureToClosure(sigs[0]);
+      } */
+      } else if (type.symbol.flags & ts.SymbolFlags.Interface) {
+        // Note: ts.InterfaceType has a typeParameters field, but that
+        // specifies the parameters that the interface type *expects*
+        // when it's used, and should not be transformed to the output.
+        // E.g. a type like Array<number> is a TypeReference to the
+        // InterfaceType "Array", but the "number" type parameter is
+        // part of the outer TypeReference, not a typeParameter on
+        // the InterfaceType.
+        if (type.symbol.flags & ts.SymbolFlags.Value) {
+          // The symbol is both a type and a value.
+          // For user-defined types in this state, we don't have a Closure name
+          // for the type.  See the type_and_value test.
+          if (!isClosureProvidedType(type.symbol)) {
+            this.warn(`type/symbol conflict for ${type.symbol.name}, using {?} for now`);
+            return '?';
+          }
         }
+        return notNullPrefix + this.symbolToString(type.symbol);
       }
-      this.warn('unhandled anonymous type');
-      return '?';
     } else if (type.flags & ts.TypeFlags.Union) {
       let unionType = type as ts.UnionType;
       let parts = unionType.types.map(t => this.translate(t, true));

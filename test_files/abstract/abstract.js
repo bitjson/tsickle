@@ -14,7 +14,7 @@ class Base {
     publicAbstract() { }
     /**
      * @abstract
-     * @param {!Array<number>} x
+     * @param {!Array} x
      * @return {void}
      */
     params(x) { }
@@ -52,7 +52,7 @@ class Derived extends Base {
      */
     publicAbstract() { }
     /**
-     * @param {!Array<number>} x
+     * @param {!Array} x
      * @return {void}
      */
     params(x) { }

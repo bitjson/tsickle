@@ -1,6 +1,6 @@
 goog.module('test_files.enum.enum');var module = module || {id: 'test_files/enum/enum.js'};
 // Line with a missing semicolon should not break the following enum.
-const /** @type {!Array<?>} */ EnumTestMissingSemi = [];
+const /** @type {!Array} */ EnumTestMissingSemi = [];
 let EnumTest1 = {};
 /** @type {number} */
 EnumTest1.XYZ = 0;
@@ -11,17 +11,17 @@ EnumTest1[EnumTest1.PI] = "PI";
 // Tsickle rewrites the above "enum" declaration into just a plain
 // number.  Verify that the resulting TypeScript still allows you to
 // index into the enum with all the various ways allowed of enums.
-let /** @type {number} */ enumTestValue = EnumTest1.XYZ;
-let /** @type {number} */ enumTestValue2 = EnumTest1['XYZ'];
+let /** @type {?} */ enumTestValue = EnumTest1.XYZ;
+let /** @type {?} */ enumTestValue2 = EnumTest1['XYZ'];
 let /** @type {string} */ enumNumIndex = EnumTest1[((null))];
 let /** @type {number} */ enumStrIndex = EnumTest1[((null))];
 /**
- * @param {number} val
+ * @param {?} val
  * @return {void}
  */
 function enumTestFunction(val) { }
 enumTestFunction(enumTestValue);
-let /** @type {number} */ enumTestLookup = EnumTest1["XYZ"];
+let /** @type {?} */ enumTestLookup = EnumTest1["XYZ"];
 exports.EnumTest2 = {};
 /** @type {number} */
 exports.EnumTest2.XYZ = 0;

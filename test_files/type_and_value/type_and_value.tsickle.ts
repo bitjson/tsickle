@@ -1,4 +1,4 @@
-Warning at test_files/type_and_value/type_and_value.ts:10:5: unhandled anonymous type
+Warning at test_files/type_and_value/type_and_value.ts:6:5: unhandled type {type flags:0x8000 Object}
 Warning at test_files/type_and_value/type_and_value.ts:16:5: type/symbol conflict for TypeAndValue, using {?} for now
 ====
 import * as conflict from './module';
@@ -6,11 +6,11 @@ import * as conflict from './module';
 // This test deals with symbols that are simultaneously types and values.
 
 // Use a browser built-in as both a type and a value.
-let /** @type {function(new: Document): ?} */ useBuiltInAsValue = Document;
+let /** @type {?} */ useBuiltInAsValue = Document;
 let /** @type {!Document} */ useBuiltInAsType: Document;
 
 // Use a user-defined class as both a type and a value.
-let /** @type {?} */ useUserClassAsValue = conflict.Class;
+let /** @type {!conflict.Class} */ useUserClassAsValue = conflict.Class;
 let /** @type {!conflict.Class} */ useUserClassAsType: conflict.Class;
 
 // Use a user-defined interface/value pair as both a type and a value.
